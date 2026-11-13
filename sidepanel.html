@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Flow Bridge</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-header">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">✦</span>
+          <strong>Flow Bridge</strong>
+        </div>
+        <div class="header-actions">
+          <button id="pinButton" class="icon-button" type="button" aria-label="Keep panel open">⌁</button>
+          <button id="closeButton" class="icon-button" type="button" aria-label="Close panel">×</button>
+        </div>
+      </header>
+
+      <div id="announcement" class="announcement">
+        <div><b>✨ Local-first queue is ready</b><span>Queue prompts, keep Flow visible, and save results locally.</span></div>
+        <button id="dismissAnnouncement" class="announcement-close" type="button" aria-label="Dismiss announcement">×</button>
+      </div>
+
+      <nav class="tabs" aria-label="Main navigation">
+        <button class="tab is-active" type="button" data-tab="home">Home</button>
+        <button class="tab" type="button" data-tab="setup">Setup</button>
+        <button class="tab" type="button" data-tab="help">Help</button>
+      </nav>
+
+      <main>
+        <section id="homeView" class="view" data-view="home">
+          <div id="notSetupState">
+            <div class="empty-hero">
+              <div class="terminal-icon" aria-hidden="true">〉_</div>
+              <h1>Not set up yet</h1>
+              <p>One paste into your coding agent<br />connects everything.</p>
+              <button id="finishSetupButton" class="gradient-button" type="button">Finish setup</button>
+            </div>
+          </div>
+
+          <div id="connectedState" class="connected-state" hidden>
+            <div class="connected-heading">
+              <div>
+                <span class="eyebrow">FLOW WORKSPACE</span>
+                <h1>Prompt queue</h1>
+              </div>
+              <div class="connection-actions"><span id="connectionPill" class="status-pill">Checking…</span><button id="refreshConnectionButton" class="refresh-button" type="button">↻</button></div>
+            </div>
+            <div id="flowWarning" class="inline-warning" hidden>Open a visible Google Flow tab before starting.</div>
+            <textarea id="promptInput" class="prompt-input" rows="5" placeholder="One prompt per line…"></textarea>
+            <div class="queue-options">
+              <label>Type<select id="modeSelect"><option value="image">Images</option><option value="video">Videos</option><option value="character">Character</option></select></label>
+              <label>Delay<select id="delaySelect"><option value="2500">2.5 sec</option><option value="5000">5 sec</option><option value="10000">10 sec</option></select></label>
+              <label>Prefix<input id="prefixInput" type="text" value="flow" maxlength="24" /></label>
+            </div>
+            <div class="reference-card">
+              <div class="reference-heading"><b>Reference images</b><span id="referenceCount">0 selected</span></div>
+              <input id="referenceFiles" type="file" accept="image/*" multiple />
+              <small>Same reference images will be attached to each queued prompt. Character mode needs at least one image.</small>
+              <div id="referencePreview" class="reference-preview"></div>
+            </div>
+            <label id="characterNameRow" class="character-name-row" hidden>Character name<input id="characterName" type="text" placeholder="e.g. Maya" maxlength="40" /></label>
+            <div class="queue-actions">
+              <button id="addQueueButton" class="secondary-button" type="button">Add to queue</button>
+              <button id="startQueueButton" class="gradient-button compact" type="button">Start queue</button>
+              <button id="stopQueueButton" class="danger-button compact" type="button" hidden>Pause</button>
+            </div>
+            <div class="queue-summary"><span>QUEUE</span><b id="queueCount">0 items</b><span id="queueStatus">Ready</span><button id="clearQueueButton" class="clear-button" type="button">Clear</button></div>
+            <div id="queueList" class="queue-list"></div>
+          </div>
+
+          <section class="plan-card">
+            <div class="plan-top"><strong><span class="bolt">ϟ</span> Free plan</strong><button id="signInButton" class="sign-in-button" type="button">♙&nbsp; Sign in</button></div>
+            <div class="usage-row"><span>Videos</span><b><span id="videoCount">0</span> <small>/ 30</small></b></div>
+            <div class="usage-track"><span id="videoUsage"></span></div>
+            <div class="usage-row"><span>Images</span><b><span id="imageCount">0</span> <small>/ 40</small></b></div>
+            <div class="usage-track"><span id="imageUsage"></span></div>
+          </section>
+        </section>
+
+        <section id="setupView" class="view" data-view="setup" hidden>
+          <span class="eyebrow">ONE-TIME SETUP</span>
+          <h1>Connect your agent</h1>
+          <p class="muted-copy">Flow Bridge runs in your own browser. Choose the agent you use, copy the setup message, and paste it once.</p>
+          <div class="setup-steps">
+            <div class="step"><span>1</span><div><b>Open a Flow tab</b><small>Sign in to Google Flow in a visible browser tab.</small></div></div>
+            <div class="step"><span>2</span><div><b>Choose your agent</b><select id="agentSelect"><option>Claude Code</option><option>Cursor</option><option>Codex</option><option>Gemini CLI</option><option>Other MCP client</option></select></div></div>
+            <div class="step"><span>3</span><div><b>Paste the setup message</b><small>The message only describes the local bridge; it never asks for a password or token.</small></div></div>
+          </div>
+          <textarea id="setupPrompt" class="setup-prompt" readonly></textarea>
+          <button id="copySetupButton" class="gradient-button" type="button">Copy setup message</button>
+          <button id="markSetupButton" class="text-button" type="button">I’ve completed setup</button>
+          <p id="copyStatus" class="copy-status" role="status"></p>
+        </section>
+
+        <section id="helpView" class="view" data-view="help" hidden>
+          <span class="eyebrow">HELP</span>
+          <h1>Keep it simple</h1>
+          <div class="help-card"><b>Flow tab not found?</b><p>Open flow.google.com in the active window, sign in, and keep that tab visible while a queue runs.</p></div>
+          <div class="help-card"><b>Prompt box not found?</b><p>Flow changes its interface occasionally. Refresh the Flow tab and reload this extension from chrome://extensions.</p></div>
+          <div class="help-card"><b>Where are files saved?</b><p>Completed results are sent to your Downloads/FlowBridge folder. No result is uploaded by this extension.</p></div>
+          <div class="help-card"><b>Version</b><p>Flow Bridge MVP 0.1.0 · local queue prototype</p></div>
+        </section>
+      </main>
+    </div>
+    <script src="sidepanel.js"></script>
+  </body>
+</html>

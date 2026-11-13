@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Flow Bridge \u2014 image & video queue",
+  "version": "0.1.0",
+  "description": "A local side panel for queuing prompts in your signed-in Google Flow tab.",
+  "permissions": [
+    "sidePanel",
+    "storage",
+    "tabs",
+    "downloads",
+    "scripting",
+    "debugger"
+  ],
+  "host_permissions": [
+    "https://flow.google.com/*",
+    "https://labs.google/*",
+    "https://*.google.com/*",
+    "https://*.googleusercontent.com/*",
+    "http://127.0.0.1/*",
+    "http://localhost/*"
+  ],
+  "action": {
+    "default_title": "Open Flow Bridge"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://flow.google.com/*",
+        "https://labs.google/*",
+        "https://*.google.com/flow/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
